@@ -13,7 +13,63 @@ public class Usuario {
     private String user;
     private String mail;
     private String contra;
-    private Diseño diseño;
+    private Diseno diseño;
+
+    public Usuario() {
+    }
+
+    public Usuario(Integer usuarioID, String user, String mail, String contra, Diseno diseño) {
+        this.usuarioID = usuarioID;
+        this.user = user;
+        this.mail = mail;
+        this.contra = contra;
+        this.diseño = diseño;
+    }
+
+    public Integer getUsuarioID() {
+        return usuarioID;
+    }
+
+    public void setUsuarioID(Integer usuarioID) {
+        this.usuarioID = usuarioID;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public String getMail() {
+        return mail;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
+    }
+
+    public String getContra() {
+        return contra;
+    }
+
+    public void setContra(String contra) {
+        this.contra = contra;
+    }
+
+    public Diseno getDiseño() {
+        return diseño;
+    }
+
+    public void setDiseño(Diseno diseño) {
+        this.diseño = diseño;
+    }
+
+    @Override
+    public String toString() {
+        return "Usuario{" + "usuarioID=" + usuarioID + ", user=" + user + ", mail=" + mail + ", contra=" + contra + ", dise\u00f1o=" + diseño + '}';
+    }
     
     
    
