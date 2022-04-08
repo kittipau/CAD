@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cadmuseo;
+package cadmuseo.museo;
 
+import cadmuseo.museo.ExcepcionMUSEO;
 import cadmuseo.museo.Obra;
 import cadmuseo.museo.Artista;
 import java.sql.CallableStatement;

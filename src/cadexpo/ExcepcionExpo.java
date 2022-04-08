@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cadmuseo;
+package cadexpo;
 
 /**
  *
  * @author Paula Unibaso 
  */
-public class ExcepcionMUSEO extends Exception {
+public class ExcepcionExpo extends Exception {
     private Integer codigoError;
     private String mensajeErrorBD;
     private String mensajeErrorUsuario;
@@ -18,7 +18,7 @@ public class ExcepcionMUSEO extends Exception {
     /**
      * Constructor por defecto
      */
-    public ExcepcionMUSEO() {
+    public ExcepcionExpo() {
     }
     
     /**
@@ -28,7 +28,7 @@ public class ExcepcionMUSEO extends Exception {
      * @param mensajeErrorUsuario
      * @param setenciaSQL 
      */
-    public ExcepcionMUSEO(Integer codigoError, String mensajeErrorBD, String mensajeErrorUsuario, String setenciaSQL) {
+    public ExcepcionExpo(Integer codigoError, String mensajeErrorBD, String mensajeErrorUsuario, String setenciaSQL) {
         this.codigoError = codigoError;
         this.mensajeErrorBD = mensajeErrorBD;
         this.mensajeErrorUsuario = mensajeErrorUsuario;
