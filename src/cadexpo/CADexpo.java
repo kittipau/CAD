@@ -51,8 +51,8 @@ public class CADexpo {
      */
     private void conectarExpo() throws ExcepcionExpo {
         try {
-            //conexion = DriverManager.getConnection("jdbc:oracle:thin:@192.168.0.69:1521:test", "MUSEO", "kk");
-            conexion = DriverManager.getConnection("jdbc:oracle:thin:@172.16.200.69:1521:test", "MUSEO", "kk");
+            conexion = DriverManager.getConnection("jdbc:oracle:thin:@192.168.0.69:1521:test", "EXPO", "kk");
+            //conexion = DriverManager.getConnection("jdbc:oracle:thin:@172.16.200.69:1521:test", "EXPO", "kk");
 
         } catch (SQLException ex) {
             ExcepcionExpo e = new ExcepcionExpo();
@@ -167,7 +167,7 @@ public class CADexpo {
 
         conectarExpo();
         int registrosafectados = 0;
-        String dml = "update DISENADOR set ALIAS = ?, DESCRIPCION = ? where ARTISTA_ID = ?";
+        String dml = "update DISENADOR set ALIAS = ?, DESCRIPCION = ? where DISENADOR_ID = ?";
         try {
             PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
             sentenciaPreparada.setObject(1, d.getAlias());
@@ -313,7 +313,7 @@ public class CADexpo {
             PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
             sentenciaPreparada.setObject(1, diseno.getNombre());
             sentenciaPreparada.setObject(2, diseno.getDescripcion());
-            sentenciaPreparada.setObject(2, diseno.getDiseñador().getDiseñadorID());
+            sentenciaPreparada.setObject(3, diseno.getDiseñador().getDiseñadorID());
             registrosafectados = sentenciaPreparada.executeUpdate();
             sentenciaPreparada.close();
             conexion.close();
@@ -356,7 +356,7 @@ public class CADexpo {
     public int eliminarDiseno(Integer disenoID) throws ExcepcionExpo {
         conectarExpo();
 
-        String dml = "delete from DISENADOR where DISENADOR_ID=" + disenoID;
+        String dml = "delete from DISENO where DISENO_ID=" + disenoID;
         int registrosAfectados = 0;
 
         try {
@@ -398,7 +398,7 @@ public class CADexpo {
 
         conectarExpo();
         int registrosafectados = 0;
-        String dml = "update DISENO set NOMBRE = ?, DESCRIPCION = ?, DISENADOR_ID where DISENO_ID = ?";
+        String dml = "update DISENO set NOMBRE = ?, DESCRIPCION = ?, DISENADOR_ID = ? where DISENO_ID = ?";
         try {
             PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
             sentenciaPreparada.setObject(1, d.getNombre());
@@ -461,10 +461,10 @@ public class CADexpo {
             ResultSet resultado = sentenciaPreparada.executeQuery();
 
             resultado.next();
-            d.setDiseñoID(resultado.getInt("DISEÑO_ID"));
+            d.setDiseñoID(resultado.getInt("DISENO_ID"));
             d.setNombre(resultado.getString("NOMBRE"));
             d.setDescripcion(resultado.getString("DESCRIPCION"));
-            di = buscarDisenador(resultado.getInt("ARTISTA_ID"));
+            di = buscarDisenador(resultado.getInt("DISENADOR_ID"));
             d.setDiseñador(di);
             sentenciaPreparada.close();
             conexion.close();
@@ -500,7 +500,7 @@ public class CADexpo {
         conectarExpo();
         Diseno d = new Diseno();
         Disenador di = new Disenador();
-        String dql1 = "select * from DISENADOR";
+        String dql1 = "select * from DISENO";
 
         try {
             Statement sentencia = conexion.createStatement();
@@ -510,7 +510,7 @@ public class CADexpo {
                 d.setDiseñoID(resultado.getInt("DISENO_ID"));
                 d.setNombre(resultado.getString("NOMBRE"));
                 d.setDescripcion(resultado.getString("DESCRIPCION"));
-                di = buscarDisenador(resultado.getInt("ARTISTA_ID"));
+                di = buscarDisenador(resultado.getInt("DISENADOR_ID"));
                 d.setDiseñador(di);
                 listadisenos.add(d);
             }
@@ -533,7 +533,6 @@ public class CADexpo {
     //-----------------------------------------------------------------------------------------------
     //   USUARIOS
     //-----------------------------------------------------------------------------------------------
-    
     /**
      * Método para insertar un nuevo usuario en la Base de datos
      *
@@ -545,7 +544,7 @@ public class CADexpo {
     public int insertarUsuario(Usuario usuario) throws ExcepcionExpo {
         conectarExpo();
         int registrosafectados = 0;
-        String dml = "insert into USUARIO(DISENO_ID, USER, MAIL, CONTRA, DISEÑO_ID)"
+        String dml = "insert into USUARIO(USUARIO_ID, USER_NAME, MAIL, CONTRA, DISENO_ID)"
                 + "values (USUARIO_SEQ.nextval, ?, ?, ?, ?)";
         try {
             PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
@@ -634,7 +633,7 @@ public class CADexpo {
 
         conectarExpo();
         int registrosafectados = 0;
-        String dml = "update USUARIO set USER = ?, MAIL = ?, CONTRA = ?, DISEÑO_ID = ?, where DISENO_ID = ?";
+        String dml = "update USUARIO set USER_NAME = ?, MAIL = ?, CONTRA = ?, DISENO_ID = ? where USUARIO_ID = ?";
         try {
             PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
             sentenciaPreparada.setObject(1, u.getUser());
@@ -701,7 +700,7 @@ public class CADexpo {
             resultado.next();
             u.setUsuarioID(resultado.getInt("USUARIO_ID"));
             u.setContra(resultado.getString("CONTRA"));
-            u.setUser(resultado.getString("USER"));
+            u.setUser(resultado.getString("USER_NAME"));
             u.setMail(resultado.getString("MAIL"));
             u.setDiseño(buscarDiseno(resultado.getInt("DISENO_ID")));
 
@@ -749,7 +748,7 @@ public class CADexpo {
                 resultado.next();
                 u.setUsuarioID(resultado.getInt("USUARIO_ID"));
                 u.setContra(resultado.getString("CONTRA"));
-                u.setUser(resultado.getString("USER"));
+                u.setUser(resultado.getString("USER_NAME"));
                 u.setMail(resultado.getString("MAIL"));
                 u.setDiseño(buscarDiseno(resultado.getInt("DISENO_ID")));
                 listaUsuarios.add(u);
@@ -769,12 +768,10 @@ public class CADexpo {
         }
         return listaUsuarios;
     }
-    
-    
+
     //-----------------------------------------------------------------------------------------------
     //   CONFIGURACIÓN
     //-----------------------------------------------------------------------------------------------
-    
     /**
      * Método para actualizar la información de la Configuración
      *
@@ -834,7 +831,7 @@ public class CADexpo {
         return registrosafectados;
     }
 
-      /**
+    /**
      * Método para buscar la información de un diseñador de la Base de Datos
      *
      * @param usuarioID El id del usuario que se quiere buscar
@@ -844,20 +841,19 @@ public class CADexpo {
      *
      */
     public Configuracion verConfig() throws ExcepcionExpo {
-        Configuracion c = new Configuracion();        
+        Configuracion c = new Configuracion();
         conectarExpo();
         String dml = "select * from CONFIGURACION";
         try {
             PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
-           
+
             ResultSet resultado = sentenciaPreparada.executeQuery();
 
             resultado.next();
-            c.setConfigID(resultado.getInt("CONFIG_ID"));
             c.setFechaLimita(resultado.getDate("FECHA_LIMITE"));
             c.setAdminPass(resultado.getString("ADMIN_PASS"));
             c.setAdminNombre(resultado.getString("ADMIN_USER"));
-            
+
             sentenciaPreparada.close();
             conexion.close();
 
