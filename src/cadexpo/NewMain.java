@@ -4,6 +4,8 @@
  */
 package cadexpo;
 
+import cadexpo.Servidor.Servidor;
+
 /**
  *
  * @author Paula
@@ -16,6 +18,7 @@ public class NewMain {
     public static void main(String[] args) throws ExcepcionExpo {
 
         CADexpo cad = new CADexpo();
+        Servidor servidor;
 
         Disenador dis = new Disenador();
         dis.setAlias("kitti");

@@ -4,9 +4,9 @@
  */
 package cadexpo;
 
-import cadmuseo.museo.Artista;
-import cadmuseo.museo.ExcepcionMUSEO;
-import cadmuseo.museo.Obra;
+
+import cadexpo.Servidor.Servidor;
+import cadexpo.Servidor.SesionServidor;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -24,6 +24,7 @@ import javax.swing.UIManager;
 public class CADexpo {
 
     Connection conexion;
+    SesionServidor sesion;
 
     /**
      * ConstructoR Utiliza la librería de Oracle
@@ -33,7 +34,8 @@ public class CADexpo {
      */
     public CADexpo() throws ExcepcionExpo {
         try {
-            Class.forName("oracle.jdbc.driver.OracleDriver");
+            Class.forName("org.postgresql.Driver");
+           // Class.forName("oracle.jdbc.driver.OracleDriver");
         } catch (ClassNotFoundException ex) {
             ExcepcionExpo e = new ExcepcionExpo();
             e.setCodigoError(null);
@@ -51,7 +53,8 @@ public class CADexpo {
      */
     private void conectarExpo() throws ExcepcionExpo {
         try {
-            conexion = DriverManager.getConnection("jdbc:oracle:thin:@192.168.0.69:1521:test", "EXPO", "kk");
+            conexion = DriverManager.getConnection("jdbc:postgresql://localhost:5432/firmacentbai", "firmacentadm", "firmacentadm");
+            //conexion = DriverManager.getConnection("jdbc:oracle:thin:@192.168.0.69:1521:test", "EXPO", "kk");
             //conexion = DriverManager.getConnection("jdbc:oracle:thin:@172.16.200.69:1521:test", "EXPO", "kk");
 
         } catch (SQLException ex) {
@@ -64,8 +67,311 @@ public class CADexpo {
         }
     }
 
+    
+    
+    //-----------------------------------------------------------------------------------------------
+    //   USUARIOS
+    //-----------------------------------------------------------------------------------------------
     /**
-     * Método para insertar un nueva artista en la Base de datos
+     * Método para insertar un nuevo usuario en la Base de datos
+     *
+     * @param usuario Objeto Usuario con todos los datos que se quieren insertar
+     * @return Cantidad de registros insertados (1 si se ha insertado, 0 si no.)
+     * @throws ExcepcionExpo En caso de algún error se produce la excepción
+     * personalizada a través de ExcepcionExpo
+     */
+    public int insertarUsuario(Usuario usuario) throws ExcepcionExpo {
+        conectarExpo();
+        int registrosafectados = 0;
+        String dml = "insert into USUARIO(USUARIO_ID, USER_NAME, MAIL, CONTRA, DISENO_ID)"
+                + "values (USUARIO_SEQ.nextval, ?, ?, ?, ?)";
+        try {
+            PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
+            sentenciaPreparada.setObject(1, usuario.getUser());
+            sentenciaPreparada.setObject(2, usuario.getMail());
+            sentenciaPreparada.setObject(3, usuario.getContra());
+            sentenciaPreparada.setObject(4, usuario.getDiseño().getDiseñoID());
+            registrosafectados = sentenciaPreparada.executeUpdate();
+            sentenciaPreparada.close(); 
+            conexion.close();
+        } catch (SQLException ex) {
+            ExcepcionExpo e = new ExcepcionExpo();
+            e.setCodigoError(ex.getErrorCode());
+            e.setMensajeErrorBD(ex.getMessage());
+            e.setSentenciaSQL(dml);
+
+            switch (ex.getErrorCode()) {
+                case 1400:
+                    e.setMensajeErrorUsuario("El nombre de la obra y el identificador del artista son obligatorios.");
+                    break;
+                case 1403:
+                    e.setMensajeErrorUsuario("No existe el artista seleccionado.");
+                case 2291:
+                    e.setMensajeErrorUsuario("No existe el artista seleccionado.");
+                    break;
+                case 20002:
+                    e.setMensajeErrorUsuario(" El nombre de la obra no puede contener el alias del artista.");
+                    break;
+                default:
+                    e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
+            }
+            throw e;
+
+        }
+
+        return registrosafectados;
+    }
+
+    /**
+     * Método para eliminar un disenador de la Base de datos
+     *
+     * @param disenadorID id del disenador que se quiere eliminar
+     * @return Cantidad de registros insertados (1 si se ha eliminado, 0 si no)
+     * @throws ExcepcionExpo En caso de algún error se produce la excepción
+     * personalizada a través de ExcepcionExpo
+     */
+    public int eliminarUsuario(Integer usuarioID) throws ExcepcionExpo {
+        conectarExpo();
+
+        String dml = "delete from USUARIO where USUARIO_ID=" + usuarioID;
+        int registrosAfectados = 0;
+
+        try {
+            Statement sentencia = conexion.createStatement();
+            registrosAfectados = sentencia.executeUpdate(dml);
+            sentencia.close();
+            conexion.close();
+
+        } catch (SQLException ex) {
+            ExcepcionExpo e = new ExcepcionExpo();
+            e.setCodigoError(ex.getErrorCode());
+            e.setMensajeErrorBD(ex.getMessage());
+            e.setSentenciaSQL(dml);
+            switch (ex.getErrorCode()) {
+                case 904:
+                    e.setMensajeErrorUsuario("No existe un usuario con el identificador indicado.");
+                default:
+                    e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
+            }
+            throw e;
+        }
+        return registrosAfectados;
+    }
+
+    /**
+     * Método para actualizar la información de un Diseñador
+     *
+     * @param usuarioID id del usuario que se quiere actualizar
+     * @param u objeto de tipo Usuario con los datos nuevos
+     * @return Cantidad de registros modificados (1 si se ha modificado, 0 si
+     * no)
+     * @throws ExcepcionExpo En caso de algún error se produce la excepción
+     * personalizada a través de ExcepcionExpo
+     */
+    public int actualizarUsuario(Integer usuarioID, Usuario u) throws ExcepcionExpo {
+
+        conectarExpo();
+        int registrosafectados = 0;
+        String dml = "update USUARIO set USER_NAME = ?, MAIL = ?, CONTRA = ?, DISENO_ID = ? where USUARIO_ID = ?";
+        try {
+            PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
+            sentenciaPreparada.setObject(1, u.getUser());
+            sentenciaPreparada.setObject(2, u.getMail());
+            sentenciaPreparada.setObject(3, u.getContra());
+            sentenciaPreparada.setObject(4, u.getDiseño().getDiseñoID());
+            sentenciaPreparada.setInt(5, usuarioID);
+
+            registrosafectados = sentenciaPreparada.executeUpdate();
+            sentenciaPreparada.close();
+            conexion.close();
+
+        } catch (SQLException ex) {
+            ExcepcionExpo e = new ExcepcionExpo();
+            e.setCodigoError(ex.getErrorCode());
+            e.setMensajeErrorBD(ex.getMessage());
+            e.setSentenciaSQL(dml);
+
+            switch (ex.getErrorCode()) {
+                case 1:
+                    e.setMensajeErrorUsuario("El alias y el email deben ser únicos.");
+                    break;
+                case 1407:
+                    e.setMensajeErrorUsuario("El nombre, el apellido, el DNI, y el teléfono son obligatorios");
+                    break;
+                // case 2292:
+                //    e.setMensajeErrorUsuario("No se puede moficiar el id del artista");
+                case 2290:
+                    e.setMensajeErrorUsuario("Error en el formato: El email debe llevar el caracter \"@\", el DNI 8 dígitos y una letra, y el teléfono 9 dígitos.");
+                    break;
+                case 12899:
+                    e.setMensajeErrorUsuario("EL DNI y el teléfono deben tener 9 caracteres exactos");
+                    break;
+                case 20004:
+                    e.setMensajeErrorUsuario(" El nombre de la obra no puede contener al alias del artista.");
+                    break;
+                default:
+                    e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
+            }
+            throw e;
+        }
+        return registrosafectados;
+    }
+
+    /**
+     * Método para buscar la información de un diseñador de la Base de Datos
+     *
+     * @param usuarioID El id del usuario que se quiere buscar
+     * @return a Devuelve un usuario con la informacion encontrada en la BD
+     * @throws ExcepcionExpo En caso de algún error se produce la excepción
+     * personalizada a través de ExcepcionExpo
+     *
+     */
+    public Usuario buscarUsuario(Integer usuarioID) throws ExcepcionExpo {
+        Usuario u = new Usuario();
+        Diseno d = new Diseno();
+        conectarExpo();
+        String dml = "select * from USUARIO where USUARIO_ID = ?";
+        try {
+            PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
+            sentenciaPreparada.setInt(1, usuarioID);
+            ResultSet resultado = sentenciaPreparada.executeQuery();
+
+            resultado.next();
+            u.setUsuarioID(resultado.getInt("USUARIO_ID"));
+            u.setContra(resultado.getString("CONTRA"));
+            u.setUser(resultado.getString("USER_NAME"));
+            u.setMail(resultado.getString("MAIL"));
+            u.setDiseño(buscarDiseno(resultado.getInt("DISENO_ID")));
+
+            sentenciaPreparada.close();
+            conexion.close();
+
+        } catch (SQLException ex) {
+            ExcepcionExpo e = new ExcepcionExpo();
+            e.setCodigoError(ex.getErrorCode());
+            e.setMensajeErrorBD(ex.getMessage());
+            e.setSentenciaSQL(dml);
+            switch (ex.getErrorCode()) {
+
+                case 17011:
+                    e.setMensajeErrorUsuario("No existe ningún artista con ese ID.");
+                    break;
+                default:
+                    e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
+
+            }
+            throw e;
+        }
+        return u;
+    }
+
+    /**
+     * Método para ver todos los usuarios de la Base de datos
+     *
+     * @return listaUsuarios. Devuelve un ArrayList con la lista de usuarios
+     * @throws ExcepcionExpo En caso de algún error se produce la excepción
+     * personalizada a través de ExcepcionExpo
+     */
+    public ArrayList<Usuario> leerUsuarios() throws ExcepcionExpo {
+        ArrayList<Usuario> listaUsuarios = new ArrayList<Usuario>();
+        conectarExpo();
+        Usuario u = new Usuario();
+        Diseno d = new Diseno();
+        String dql1 = "select * from USUARIO";
+
+        try {
+            Statement sentencia = conexion.createStatement();
+            ResultSet resultado = sentencia.executeQuery(dql1);
+
+            while (resultado.next()) {
+                resultado.next();
+                u.setUsuarioID(resultado.getInt("USUARIO_ID"));
+                u.setContra(resultado.getString("CONTRA"));
+                u.setUser(resultado.getString("USER_NAME"));
+                u.setMail(resultado.getString("MAIL"));
+                u.setDiseño(buscarDiseno(resultado.getInt("DISENO_ID")));
+                listaUsuarios.add(u);
+            }
+            resultado.close();
+
+            sentencia.close();
+            conexion.close();
+        } catch (SQLException ex) {
+            ExcepcionExpo e = new ExcepcionExpo();
+            e.setCodigoError(ex.getErrorCode());
+            e.setMensajeErrorBD(ex.getMessage());
+            e.setSentenciaSQL(dql1);
+            e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
+
+            throw e;
+        }
+        return listaUsuarios;
+    }
+
+    //-----------------------------------------------------------------------------------------------
+    //   CONFIGURACIÓN
+    //-----------------------------------------------------------------------------------------------
+    /**
+     * Método para actualizar la información de la Configuración
+     *
+     * @param usuarioID id del usuario que se quiere actualizar
+     * @param u objeto de tipo Usuario con los datos nuevos
+     * @return Cantidad de registros modificados (1 si se ha modificado, 0 si
+     * no)
+     * @throws ExcepcionExpo En caso de algún error se produce la excepción
+     * personalizada a través de ExcepcionExpo
+     */
+    public int actulizarConfig(Integer usuarioID, Usuario u) throws ExcepcionExpo {
+
+        conectarExpo();
+        int registrosafectados = 0;
+        String dml = "update USUARIO set USER = ?, MAIL = ?, CONTRA = ?, DISEÑO_ID = ?, where DISENO_ID = ?";
+        try {
+            PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
+            sentenciaPreparada.setObject(1, u.getUser());
+            sentenciaPreparada.setObject(2, u.getMail());
+            sentenciaPreparada.setObject(3, u.getContra());
+            sentenciaPreparada.setObject(4, u.getDiseño().getDiseñoID());
+            sentenciaPreparada.setInt(5, usuarioID);
+
+            registrosafectados = sentenciaPreparada.executeUpdate();
+            sentenciaPreparada.close();
+            conexion.close();
+
+        } catch (SQLException ex) {
+            ExcepcionExpo e = new ExcepcionExpo();
+            e.setCodigoError(ex.getErrorCode());
+            e.setMensajeErrorBD(ex.getMessage());
+            e.setSentenciaSQL(dml);
+
+            switch (ex.getErrorCode()) {
+                case 1:
+                    e.setMensajeErrorUsuario("El alias y el email deben ser únicos.");
+                    break;
+                case 1407:
+                    e.setMensajeErrorUsuario("El nombre, el apellido, el DNI, y el teléfono son obligatorios");
+                    break;
+                // case 2292:
+                //    e.setMensajeErrorUsuario("No se puede moficiar el id del artista");
+                case 2290:
+                    e.setMensajeErrorUsuario("Error en el formato: El email debe llevar el caracter \"@\", el DNI 8 dígitos y una letra, y el teléfono 9 dígitos.");
+                    break;
+                case 12899:
+                    e.setMensajeErrorUsuario("EL DNI y el teléfono deben tener 9 caracteres exactos");
+                    break;
+                case 20004:
+                    e.setMensajeErrorUsuario(" El nombre de la obra no puede contener al alias del artista.");
+                    break;
+                default:
+                    e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
+            }
+            throw e;
+        }
+        return registrosafectados;
+    }
+    
+    /**
+     * Método para insertar un nuevo diseñador en la Base de datos
      *
      * @param disenador Objeto Disenador con todos los datos que se quieren
      * insertar
@@ -530,306 +836,6 @@ public class CADexpo {
         return listadisenos;
     }
 
-    //-----------------------------------------------------------------------------------------------
-    //   USUARIOS
-    //-----------------------------------------------------------------------------------------------
-    /**
-     * Método para insertar un nuevo usuario en la Base de datos
-     *
-     * @param usuario Objeto Usuario con todos los datos que se quieren insertar
-     * @return Cantidad de registros insertados (1 si se ha insertado, 0 si no.)
-     * @throws ExcepcionExpo En caso de algún error se produce la excepción
-     * personalizada a través de ExcepcionExpo
-     */
-    public int insertarUsuario(Usuario usuario) throws ExcepcionExpo {
-        conectarExpo();
-        int registrosafectados = 0;
-        String dml = "insert into USUARIO(USUARIO_ID, USER_NAME, MAIL, CONTRA, DISENO_ID)"
-                + "values (USUARIO_SEQ.nextval, ?, ?, ?, ?)";
-        try {
-            PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
-            sentenciaPreparada.setObject(1, usuario.getUser());
-            sentenciaPreparada.setObject(2, usuario.getMail());
-            sentenciaPreparada.setObject(3, usuario.getContra());
-            sentenciaPreparada.setObject(4, usuario.getDiseño().getDiseñoID());
-            registrosafectados = sentenciaPreparada.executeUpdate();
-            sentenciaPreparada.close();
-            conexion.close();
-        } catch (SQLException ex) {
-            ExcepcionExpo e = new ExcepcionExpo();
-            e.setCodigoError(ex.getErrorCode());
-            e.setMensajeErrorBD(ex.getMessage());
-            e.setSentenciaSQL(dml);
-
-            switch (ex.getErrorCode()) {
-                case 1400:
-                    e.setMensajeErrorUsuario("El nombre de la obra y el identificador del artista son obligatorios.");
-                    break;
-                case 1403:
-                    e.setMensajeErrorUsuario("No existe el artista seleccionado.");
-                case 2291:
-                    e.setMensajeErrorUsuario("No existe el artista seleccionado.");
-                    break;
-                case 20002:
-                    e.setMensajeErrorUsuario(" El nombre de la obra no puede contener el alias del artista.");
-                    break;
-                default:
-                    e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
-            }
-            throw e;
-
-        }
-
-        return registrosafectados;
-    }
-
-    /**
-     * Método para eliminar un disenador de la Base de datos
-     *
-     * @param disenadorID id del disenador que se quiere eliminar
-     * @return Cantidad de registros insertados (1 si se ha eliminado, 0 si no)
-     * @throws ExcepcionExpo En caso de algún error se produce la excepción
-     * personalizada a través de ExcepcionExpo
-     */
-    public int eliminarUsuario(Integer usuarioID) throws ExcepcionExpo {
-        conectarExpo();
-
-        String dml = "delete from USUARIO where USUARIO_ID=" + usuarioID;
-        int registrosAfectados = 0;
-
-        try {
-            Statement sentencia = conexion.createStatement();
-            registrosAfectados = sentencia.executeUpdate(dml);
-            sentencia.close();
-            conexion.close();
-
-        } catch (SQLException ex) {
-            ExcepcionExpo e = new ExcepcionExpo();
-            e.setCodigoError(ex.getErrorCode());
-            e.setMensajeErrorBD(ex.getMessage());
-            e.setSentenciaSQL(dml);
-            switch (ex.getErrorCode()) {
-                case 904:
-                    e.setMensajeErrorUsuario("No existe un usuario con el identificador indicado.");
-                default:
-                    e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
-            }
-            throw e;
-        }
-        return registrosAfectados;
-    }
-
-    /**
-     * Método para actualizar la información de un Diseñador
-     *
-     * @param usuarioID id del usuario que se quiere actualizar
-     * @param u objeto de tipo Usuario con los datos nuevos
-     * @return Cantidad de registros modificados (1 si se ha modificado, 0 si
-     * no)
-     * @throws ExcepcionExpo En caso de algún error se produce la excepción
-     * personalizada a través de ExcepcionExpo
-     */
-    public int actualizarUsuario(Integer usuarioID, Usuario u) throws ExcepcionExpo {
-
-        conectarExpo();
-        int registrosafectados = 0;
-        String dml = "update USUARIO set USER_NAME = ?, MAIL = ?, CONTRA = ?, DISENO_ID = ? where USUARIO_ID = ?";
-        try {
-            PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
-            sentenciaPreparada.setObject(1, u.getUser());
-            sentenciaPreparada.setObject(2, u.getMail());
-            sentenciaPreparada.setObject(3, u.getContra());
-            sentenciaPreparada.setObject(4, u.getDiseño().getDiseñoID());
-            sentenciaPreparada.setInt(5, usuarioID);
-
-            registrosafectados = sentenciaPreparada.executeUpdate();
-            sentenciaPreparada.close();
-            conexion.close();
-
-        } catch (SQLException ex) {
-            ExcepcionExpo e = new ExcepcionExpo();
-            e.setCodigoError(ex.getErrorCode());
-            e.setMensajeErrorBD(ex.getMessage());
-            e.setSentenciaSQL(dml);
-
-            switch (ex.getErrorCode()) {
-                case 1:
-                    e.setMensajeErrorUsuario("El alias y el email deben ser únicos.");
-                    break;
-                case 1407:
-                    e.setMensajeErrorUsuario("El nombre, el apellido, el DNI, y el teléfono son obligatorios");
-                    break;
-                // case 2292:
-                //    e.setMensajeErrorUsuario("No se puede moficiar el id del artista");
-                case 2290:
-                    e.setMensajeErrorUsuario("Error en el formato: El email debe llevar el caracter \"@\", el DNI 8 dígitos y una letra, y el teléfono 9 dígitos.");
-                    break;
-                case 12899:
-                    e.setMensajeErrorUsuario("EL DNI y el teléfono deben tener 9 caracteres exactos");
-                    break;
-                case 20004:
-                    e.setMensajeErrorUsuario(" El nombre de la obra no puede contener al alias del artista.");
-                    break;
-                default:
-                    e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
-            }
-            throw e;
-        }
-        return registrosafectados;
-    }
-
-    /**
-     * Método para buscar la información de un diseñador de la Base de Datos
-     *
-     * @param usuarioID El id del usuario que se quiere buscar
-     * @return a Devuelve un usuario con la informacion encontrada en la BD
-     * @throws ExcepcionExpo En caso de algún error se produce la excepción
-     * personalizada a través de ExcepcionExpo
-     *
-     */
-    public Usuario buscarUsuario(Integer usuarioID) throws ExcepcionExpo {
-        Usuario u = new Usuario();
-        Diseno d = new Diseno();
-        conectarExpo();
-        String dml = "select * from USUARIO where USUARIO_ID = ?";
-        try {
-            PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
-            sentenciaPreparada.setInt(1, usuarioID);
-            ResultSet resultado = sentenciaPreparada.executeQuery();
-
-            resultado.next();
-            u.setUsuarioID(resultado.getInt("USUARIO_ID"));
-            u.setContra(resultado.getString("CONTRA"));
-            u.setUser(resultado.getString("USER_NAME"));
-            u.setMail(resultado.getString("MAIL"));
-            u.setDiseño(buscarDiseno(resultado.getInt("DISENO_ID")));
-
-            sentenciaPreparada.close();
-            conexion.close();
-
-        } catch (SQLException ex) {
-            ExcepcionExpo e = new ExcepcionExpo();
-            e.setCodigoError(ex.getErrorCode());
-            e.setMensajeErrorBD(ex.getMessage());
-            e.setSentenciaSQL(dml);
-            switch (ex.getErrorCode()) {
-
-                case 17011:
-                    e.setMensajeErrorUsuario("No existe ningún artista con ese ID.");
-                    break;
-                default:
-                    e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
-
-            }
-            throw e;
-        }
-        return u;
-    }
-
-    /**
-     * Método para ver todos los usuarios de la Base de datos
-     *
-     * @return listaUsuarios. Devuelve un ArrayList con la lista de usuarios
-     * @throws ExcepcionExpo En caso de algún error se produce la excepción
-     * personalizada a través de ExcepcionExpo
-     */
-    public ArrayList<Usuario> leerUsuarios() throws ExcepcionExpo {
-        ArrayList<Usuario> listaUsuarios = new ArrayList<Usuario>();
-        conectarExpo();
-        Usuario u = new Usuario();
-        Diseno d = new Diseno();
-        String dql1 = "select * from USUARIO";
-
-        try {
-            Statement sentencia = conexion.createStatement();
-            ResultSet resultado = sentencia.executeQuery(dql1);
-
-            while (resultado.next()) {
-                resultado.next();
-                u.setUsuarioID(resultado.getInt("USUARIO_ID"));
-                u.setContra(resultado.getString("CONTRA"));
-                u.setUser(resultado.getString("USER_NAME"));
-                u.setMail(resultado.getString("MAIL"));
-                u.setDiseño(buscarDiseno(resultado.getInt("DISENO_ID")));
-                listaUsuarios.add(u);
-            }
-            resultado.close();
-
-            sentencia.close();
-            conexion.close();
-        } catch (SQLException ex) {
-            ExcepcionExpo e = new ExcepcionExpo();
-            e.setCodigoError(ex.getErrorCode());
-            e.setMensajeErrorBD(ex.getMessage());
-            e.setSentenciaSQL(dql1);
-            e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
-
-            throw e;
-        }
-        return listaUsuarios;
-    }
-
-    //-----------------------------------------------------------------------------------------------
-    //   CONFIGURACIÓN
-    //-----------------------------------------------------------------------------------------------
-    /**
-     * Método para actualizar la información de la Configuración
-     *
-     * @param usuarioID id del usuario que se quiere actualizar
-     * @param u objeto de tipo Usuario con los datos nuevos
-     * @return Cantidad de registros modificados (1 si se ha modificado, 0 si
-     * no)
-     * @throws ExcepcionExpo En caso de algún error se produce la excepción
-     * personalizada a través de ExcepcionExpo
-     */
-    public int actulizarConfig(Integer usuarioID, Usuario u) throws ExcepcionExpo {
-
-        conectarExpo();
-        int registrosafectados = 0;
-        String dml = "update USUARIO set USER = ?, MAIL = ?, CONTRA = ?, DISEÑO_ID = ?, where DISENO_ID = ?";
-        try {
-            PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
-            sentenciaPreparada.setObject(1, u.getUser());
-            sentenciaPreparada.setObject(2, u.getMail());
-            sentenciaPreparada.setObject(3, u.getContra());
-            sentenciaPreparada.setObject(4, u.getDiseño().getDiseñoID());
-            sentenciaPreparada.setInt(5, usuarioID);
-
-            registrosafectados = sentenciaPreparada.executeUpdate();
-            sentenciaPreparada.close();
-            conexion.close();
-
-        } catch (SQLException ex) {
-            ExcepcionExpo e = new ExcepcionExpo();
-            e.setCodigoError(ex.getErrorCode());
-            e.setMensajeErrorBD(ex.getMessage());
-            e.setSentenciaSQL(dml);
-
-            switch (ex.getErrorCode()) {
-                case 1:
-                    e.setMensajeErrorUsuario("El alias y el email deben ser únicos.");
-                    break;
-                case 1407:
-                    e.setMensajeErrorUsuario("El nombre, el apellido, el DNI, y el teléfono son obligatorios");
-                    break;
-                // case 2292:
-                //    e.setMensajeErrorUsuario("No se puede moficiar el id del artista");
-                case 2290:
-                    e.setMensajeErrorUsuario("Error en el formato: El email debe llevar el caracter \"@\", el DNI 8 dígitos y una letra, y el teléfono 9 dígitos.");
-                    break;
-                case 12899:
-                    e.setMensajeErrorUsuario("EL DNI y el teléfono deben tener 9 caracteres exactos");
-                    break;
-                case 20004:
-                    e.setMensajeErrorUsuario(" El nombre de la obra no puede contener al alias del artista.");
-                    break;
-                default:
-                    e.setMensajeErrorUsuario("Error general del sistema. Consulte con el administrador.");
-            }
-            throw e;
-        }
-        return registrosafectados;
-    }
 
     /**
      * Método para buscar la información de un diseñador de la Base de Datos
