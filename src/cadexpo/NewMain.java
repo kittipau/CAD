@@ -18,7 +18,9 @@ public class NewMain {
     public static void main(String[] args) throws ExcepcionExpo {
 
         CADexpo cad = new CADexpo();
-        Servidor servidor;
+        Servidor servidor = new Servidor();
+        
+        servidor.start();
 
         Disenador dis = new Disenador();
         dis.setAlias("kitti");
@@ -46,7 +48,10 @@ public class NewMain {
         u.setUser("kitiperrima3");
         u.setMail("kiti@kitiwifi.com3");
         u.setContra("kk");
-        u.setDiseño(di);
+
+        //cad.insertarUsuario(u);
+        
+       // cad.eliminarUsuario(u.getUser());
         
         //cad.insertarUsuario(u);
         //cad.actualizarUsuario(14, u);
@@ -54,9 +59,9 @@ public class NewMain {
         //System.out.println(cad.buscarUsuario(13));
         //System.out.println(cad.leerUsuarios());
         
-        Configuracion c  = new Configuracion();
+        //Configuracion c  = new Configuracion();
         
-        System.out.println(cad.verConfig());
+
 
         
         

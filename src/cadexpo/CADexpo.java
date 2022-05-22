@@ -53,7 +53,7 @@ public class CADexpo {
      */
     private void conectarExpo() throws ExcepcionExpo {
         try {
-            conexion = DriverManager.getConnection("jdbc:postgresql://localhost:5432/firmacentbai", "firmacentadm", "firmacentadm");
+                conexion = DriverManager.getConnection("jdbc:postgresql://192.168.0.27:5432/BIAAF", "odoo", "123abc.");
             //conexion = DriverManager.getConnection("jdbc:oracle:thin:@192.168.0.69:1521:test", "EXPO", "kk");
             //conexion = DriverManager.getConnection("jdbc:oracle:thin:@172.16.200.69:1521:test", "EXPO", "kk");
 
@@ -83,14 +83,13 @@ public class CADexpo {
     public int insertarUsuario(Usuario usuario) throws ExcepcionExpo {
         conectarExpo();
         int registrosafectados = 0;
-        String dml = "insert into USUARIO(USUARIO_ID, USER_NAME, MAIL, CONTRA, DISENO_ID)"
-                + "values (USUARIO_SEQ.nextval, ?, ?, ?, ?)";
+        String dml = "insert into PAULA_USUARIOS(USERNAME, EMAIL, CONTRASENA)"
+                + "values ( ?, ?, ?)";
         try {
             PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
             sentenciaPreparada.setObject(1, usuario.getUser());
             sentenciaPreparada.setObject(2, usuario.getMail());
             sentenciaPreparada.setObject(3, usuario.getContra());
-            sentenciaPreparada.setObject(4, usuario.getDiseño().getDiseñoID());
             registrosafectados = sentenciaPreparada.executeUpdate();
             sentenciaPreparada.close(); 
             conexion.close();
@@ -125,15 +124,15 @@ public class CADexpo {
     /**
      * Método para eliminar un disenador de la Base de datos
      *
-     * @param disenadorID id del disenador que se quiere eliminar
+     * @param nombre id del disenador que se quiere eliminar
      * @return Cantidad de registros insertados (1 si se ha eliminado, 0 si no)
      * @throws ExcepcionExpo En caso de algún error se produce la excepción
      * personalizada a través de ExcepcionExpo
      */
-    public int eliminarUsuario(Integer usuarioID) throws ExcepcionExpo {
+    public int eliminarUsuario(String username) throws ExcepcionExpo {
         conectarExpo();
 
-        String dml = "delete from USUARIO where USUARIO_ID=" + usuarioID;
+        String dml = "delete from PAULA_USUARIOS where USERNAME= " +"'"+ username +"'";
         int registrosAfectados = 0;
 
         try {
@@ -168,18 +167,18 @@ public class CADexpo {
      * @throws ExcepcionExpo En caso de algún error se produce la excepción
      * personalizada a través de ExcepcionExpo
      */
-    public int actualizarUsuario(Integer usuarioID, Usuario u) throws ExcepcionExpo {
+    public int actualizarUsuario(String username, Usuario u) throws ExcepcionExpo {
 
         conectarExpo();
         int registrosafectados = 0;
-        String dml = "update USUARIO set USER_NAME = ?, MAIL = ?, CONTRA = ?, DISENO_ID = ? where USUARIO_ID = ?";
+        String dml = "update PAULA_USUARIOS set USERNAME = ?, MAIL = ?, CONTRA = ?, DISENO_ID = ? where    USERNAME = ?";
         try {
             PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
             sentenciaPreparada.setObject(1, u.getUser());
             sentenciaPreparada.setObject(2, u.getMail());
             sentenciaPreparada.setObject(3, u.getContra());
             sentenciaPreparada.setObject(4, u.getDiseño().getDiseñoID());
-            sentenciaPreparada.setInt(5, usuarioID);
+            sentenciaPreparada.setString(5, username);
 
             registrosafectados = sentenciaPreparada.executeUpdate();
             sentenciaPreparada.close();
@@ -226,20 +225,20 @@ public class CADexpo {
      * personalizada a través de ExcepcionExpo
      *
      */
-    public Usuario buscarUsuario(Integer usuarioID) throws ExcepcionExpo {
+    public Usuario buscarUsuario(String username) throws ExcepcionExpo {
         Usuario u = new Usuario();
         Diseno d = new Diseno();
         conectarExpo();
-        String dml = "select * from USUARIO where USUARIO_ID = ?";
+        String dml = "select * from PAULA_USUARIOS where USERNAME = ?";
         try {
             PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
-            sentenciaPreparada.setInt(1, usuarioID);
+            sentenciaPreparada.setString(1, username);
             ResultSet resultado = sentenciaPreparada.executeQuery();
 
             resultado.next();
             u.setUsuarioID(resultado.getInt("USUARIO_ID"));
             u.setContra(resultado.getString("CONTRA"));
-            u.setUser(resultado.getString("USER_NAME"));
+            u.setUser(resultado.getString("USERNAME"));
             u.setMail(resultado.getString("MAIL"));
             u.setDiseño(buscarDiseno(resultado.getInt("DISENO_ID")));
 

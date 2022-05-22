@@ -29,13 +29,13 @@ public class Servidor extends Thread {
     @Override
     public void run() {
         try {
-            // se abre un socket servidor en el puerto 30500
+               System.out.println("Servidor.Consola - Se abre un socket servidor en el puerto 30500 de la máquina local");
             int puertoServidor = 30500;
             ServerSocket socketServidor = new ServerSocket(puertoServidor);
-
-            //Se crea un arraylist con las sesiones
+            
+            System.out.println("Servidor.Consola - Se crea un ArrayList para almacenar los manejadores de sockets de los clientes");
             ArrayList<SesionServidor> sesiones = new ArrayList();
-            //El servidor queda a la espera indefinidamente de todas las conexiones de cleinte que se produzcan"
+            System.out.println("Servidor.Consola - El servidor queda a la espera indefinidamente de todas las conexiones de cleinte que se produzcan");
             Socket clienteConectado;
             SesionServidor sesion;
             while (true) {
