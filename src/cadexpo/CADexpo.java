@@ -85,8 +85,7 @@ public class CADexpo {
         int registrosafectados = 0;
         String dml = "insert into PAULA_USUARIOS(USERNAME, EMAIL, CONTRASENA)"
                 + "values ( ?, ?, ?)";
-        try {
-        if (buscarUsuario(usuario.getUser())== 0){        
+        try {         
             
             PreparedStatement sentenciaPreparada = conexion.prepareStatement(dml);
             sentenciaPreparada.setObject(1, usuario.getUser());
@@ -95,7 +94,7 @@ public class CADexpo {
             registrosafectados = sentenciaPreparada.executeUpdate();
             sentenciaPreparada.close(); 
             conexion.close();
-        }
+        
         
         } catch (SQLException ex) {
             ExcepcionExpo e = new ExcepcionExpo();
