@@ -11,7 +11,8 @@ package cadexpo;
 class Disenador {
     private Integer diseñadorID;
     private String alias;
-    private String descripcion;   
+    private String descripcion;  
+    private Diseno diseno;
 
     public Disenador() {
     }

@@ -7,6 +7,7 @@ package cadexpo.Servidor;
 import cadexpo.CADexpo;
 import cadexpo.ExcepcionExpo;
 import cadexpo.Usuario;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -20,10 +21,9 @@ import java.util.logging.Logger;
  *
  * @author pulpracticas.VSTI
  */
-public class SesionServidor extends Thread  {
+public class SesionServidor extends Thread {
 
     Socket clienteConectado;
-   
 
     public SesionServidor(Socket clienteConectado) {
         this.clienteConectado = clienteConectado;
@@ -32,22 +32,33 @@ public class SesionServidor extends Thread  {
     @Override
     public void run() {
         try {
-             //El servidor recibe on objeto del clente
-            System.out.println("abriendo sesión");
-            InputStream is = clienteConectado.getInputStream();           
-            ObjectInputStream ois = new ObjectInputStream(is);
-            CADexpo cad = new CADexpo();
-                        
 
+            //Recibo la opción para saber qué método invocar  
+            InputStream is = clienteConectado.getInputStream();
+            DataInputStream dis = new DataInputStream(is);
+            // abro el objeto que recibiré
+            ObjectInputStream ois = new ObjectInputStream(is);
+            //abro el cad
             OutputStream os = clienteConectado.getOutputStream();
-            //Se lee el objeto recibido 
-            Usuario usuario = (Usuario) ois.readObject();
-            System.out.println("Leyendo objeto: "+ usuario.toString());
-            cad.insertarUsuario(usuario);           
-            
-            //el servidor devuelveo el objeto (aquí se puede modificar lo que quieras
-            ObjectOutputStream oos = new ObjectOutputStream(clienteConectado.getOutputStream());
-            oos.writeObject(usuario);
+            ObjectOutputStream oos = new ObjectOutputStream(os);
+            CADexpo cad = new CADexpo();
+            Usuario usuario;
+
+            //preparo el objeto que devolveré
+            if (dis.readUTF().equalsIgnoreCase("1")) {
+                //leo el objeto 
+                usuario = (Usuario) ois.readObject();
+                //lo inserto en la BD
+                cad.insertarUsuario(usuario);
+            } else if (dis.readUTF().equalsIgnoreCase("2")){
+                //leo el objeto 
+                 usuario = (Usuario) ois.readObject();
+                 //elimino el usuario
+                cad.eliminarUsuario(usuario.getUser());
+            } else if (dis.readUTF().equalsIgnoreCase("3")){
+                 usuario = (Usuario) ois.readObject();
+            } 
+
             //cierro
             is.close();
             ois.close();

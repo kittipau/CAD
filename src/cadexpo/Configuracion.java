@@ -13,8 +13,7 @@ import java.sql.Date;
 public class Configuracion {
     private Integer configID;
     private Date fechaLimita;
-    private String adminPass;
-    private String adminNombre;
+
 
     public Configuracion() {
     }
@@ -22,8 +21,7 @@ public class Configuracion {
     public Configuracion(Integer configID, Date fechaLimita, String adminPass, String adminNombre) {
         this.configID = configID;
         this.fechaLimita = fechaLimita;
-        this.adminPass = adminPass;
-        this.adminNombre = adminNombre;
+
     }
 
     public Integer getConfigID() {
@@ -44,25 +42,10 @@ public class Configuracion {
         this.fechaLimita = fechaLimita;
     }
 
-    public String getAdminPass() {
-        return adminPass;
-    }
-
-    public void setAdminPass(String adminPass) {
-        this.adminPass = adminPass;
-    }
-
-    public String getAdminNombre() {
-        return adminNombre;
-    }
-
-    public void setAdminNombre(String adminNombre) {
-        this.adminNombre = adminNombre;
-    }
 
     @Override
     public String toString() {
-        return "Configuracion{" + "fechaLimita=" + fechaLimita + ", adminPass=" + adminPass + ", adminNombre=" + adminNombre + '}';
+        return "Configuracion{" + "fechaLimita=" + fechaLimita+ "}";
     }
     
 }
