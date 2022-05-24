@@ -32,30 +32,30 @@ public class SesionServidor extends Thread {
     @Override
     public void run() {
         try {
-
+            CADexpo cad = new CADexpo();
+            Usuario usuario;
             //Recibo la opción para saber qué método invocar  
             InputStream is = clienteConectado.getInputStream();
             DataInputStream dis = new DataInputStream(is);
             // abro el objeto que recibiré
+            String opcion = dis.readUTF();
             ObjectInputStream ois = new ObjectInputStream(is);
             //abro el cad
             OutputStream os = clienteConectado.getOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(os);
-            CADexpo cad = new CADexpo();
-            Usuario usuario;
 
             //preparo el objeto que devolveré
-            if (dis.readUTF().equalsIgnoreCase("1")) {
+            if (opcion.equalsIgnoreCase("1")) {
                 //leo el objeto 
                 usuario = (Usuario) ois.readObject();
                 //lo inserto en la BD
                 cad.insertarUsuario(usuario);
-            } else if (dis.readUTF().equalsIgnoreCase("2")){
+            } else if (opcion.equalsIgnoreCase("2")){
                 //leo el objeto 
                  usuario = (Usuario) ois.readObject();
                  //elimino el usuario
                 cad.eliminarUsuario(usuario.getUser());
-            } else if (dis.readUTF().equalsIgnoreCase("3")){
+            } else if (opcion.equalsIgnoreCase("3")){
                  usuario = (Usuario) ois.readObject();
             } 
 
