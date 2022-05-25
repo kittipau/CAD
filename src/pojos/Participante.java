@@ -10,7 +10,7 @@ import java.awt.Image;
  *
  * @author pulpracticas.VSTI
  */
-class Participante {
+public class Participante {
 
     private Integer participanteID;
     private String nombreDiseno;
