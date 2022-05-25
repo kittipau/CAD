@@ -10,7 +10,8 @@ import java.io.Serializable;
  *
  * @author pulpracticas.VSTI
  */
-public class Usuario implements Serializable{
+public class Usuario implements Serializable {
+    private static final long serialVersionUID = 8799656478674716638L;
     private Integer usuarioID;
     private String user;
     private String mail;

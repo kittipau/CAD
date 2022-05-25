@@ -5,12 +5,14 @@
 package pojos;
 
 import java.awt.Image;
+import java.io.Serializable;
 
 /**
  *
  * @author pulpracticas.VSTI
  */
-public class Participante {
+public class Participante implements Serializable {
+    private static final long serialVersionUID = 8799656478674716638L; 
 
     private Integer participanteID;
     private String nombreDiseno;
