@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package cadexpo;
+package pojos;
 
 /**
  *
@@ -12,7 +12,7 @@ class Disenador {
     private Integer diseñadorID;
     private String alias;
     private String descripcion;  
-    private Diseno diseno;
+    private Participante diseno;
 
     public Disenador() {
     }
