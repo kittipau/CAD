@@ -12,21 +12,22 @@ import java.io.Serializable;
  * @author pulpracticas.VSTI
  */
 public class Participante implements Serializable {
-    private static final long serialVersionUID = 8799656478674716638L; 
+    private static final long serialVersionUID = 8799656478674716635L; 
 
     private Integer participanteID;
     private String nombreDiseno;
     private String descripcionDiseno;
     private String nombreDisenador;
     private String desripcionDisenador;
-    private Image imagenDisenador;
-    private Image imagenDiseno;
+    //private byte[] imagenDisenador;
+    //private byte[] imagenDiseno;
 
     @Override
     public String toString() {
-        return "Participante{" + "participanteID=" + participanteID + ", nombreDiseno=" + nombreDiseno + ", descripcionDiseno=" + descripcionDiseno + ", nombreDisenador=" + nombreDisenador + ", desripcionDisenador=" + desripcionDisenador + ", imagenDisenador=" + imagenDisenador + ", imagenDiseno=" + imagenDiseno + '}';
+        return "Participante{" + "participanteID=" + participanteID + ", nombreDiseno=" + nombreDiseno + ", descripcionDiseno=" + descripcionDiseno + ", nombreDisenador=" + nombreDisenador + ", desripcionDisenador=" + desripcionDisenador + '}';
     }
-    
+
+  
 
     public Participante() {
     }
@@ -72,20 +73,6 @@ public class Participante implements Serializable {
         this.desripcionDisenador = desripcionDisenador;
     }
 
-    public Image getImagenDisenador() {
-        return imagenDisenador;
-    }
 
-    public void setImagenDisenador(Image imagenDisenador) {
-        this.imagenDisenador = imagenDisenador;
-    }
-
-    public Image getImagenDiseno() {
-        return imagenDiseno;
-    }
-
-    public void setImagenDiseno(Image imagenDiseno) {
-        this.imagenDiseno = imagenDiseno;
-    }
        
 }

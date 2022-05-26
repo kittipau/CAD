@@ -12,7 +12,7 @@ import java.sql.Date;
  * @author pulpracticas.VSTI
  */
 public class Configuracion implements Serializable {
-    private static final long serialVersionUID = 8799656478674716638L;
+    private static final long serialVersionUID = 8799656478674716636L;
     private Integer configID;
     private Date fechaLimita;
 
