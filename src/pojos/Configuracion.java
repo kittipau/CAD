@@ -14,15 +14,15 @@ import java.sql.Date;
 public class Configuracion implements Serializable {
     private static final long serialVersionUID = 8799656478674716636L;
     private Integer configID;
-    private Date fechaLimita;
+    private Date fechaLimite;
 
 
     public Configuracion() {
     }
 
-    public Configuracion(Integer configID, Date fechaLimita, String adminPass, String adminNombre) {
+    public Configuracion(Integer configID, Date fechaLimite, String adminPass, String adminNombre) {
         this.configID = configID;
-        this.fechaLimita = fechaLimita;
+        this.fechaLimite = fechaLimite;
 
     }
 
@@ -36,18 +36,18 @@ public class Configuracion implements Serializable {
 
 
 
-    public Date getFechaLimita() {
-        return fechaLimita;
+    public Date getFechaLimite() {
+        return fechaLimite;
     }
 
-    public void setFechaLimita(Date fechaLimita) {
-        this.fechaLimita = fechaLimita;
+    public void setFechaLimite(Date fechaLimite) {
+        this.fechaLimite = fechaLimite;
     }
 
 
     @Override
     public String toString() {
-        return "Configuracion{" + "fechaLimita=" + fechaLimita+ "}";
+        return "Configuracion{" + "fechaLimita=" + fechaLimite+ "}";
     }
     
 }

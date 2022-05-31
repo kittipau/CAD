@@ -12,29 +12,45 @@ import java.io.Serializable;
  * @author pulpracticas.VSTI
  */
 public class Participante implements Serializable {
-    private static final long serialVersionUID = 8799656478674716635L; 
-
+    private static final long serialVersionUID = 8799656478674716635L;
     private Integer participanteID;
     private String nombreDiseno;
     private String descripcionDiseno;
     private String nombreDisenador;
-    private String desripcionDisenador;
-    //private byte[] imagenDisenador;
-    //private byte[] imagenDiseno;
+    private String pais;
+    private byte[] imagenDisenador;
+    private byte[] imagenDiseno;
 
-    @Override
-    public String toString() {
-        return "Participante{" + "participanteID=" + participanteID + ", nombreDiseno=" + nombreDiseno + ", descripcionDiseno=" + descripcionDiseno + ", nombreDisenador=" + nombreDisenador + ", desripcionDisenador=" + desripcionDisenador + '}';
+    public Participante(String nombreDiseno, String descripcionDiseno, String nombreDisenador, String pais, byte[] imagenDisenador, byte[] imagenDiseno) {
+        this.nombreDiseno = nombreDiseno;
+        this.descripcionDiseno = descripcionDiseno;
+        this.nombreDisenador = nombreDisenador;
+        this.pais = pais;
+        this.imagenDisenador = imagenDisenador;
+        this.imagenDiseno = imagenDiseno;
     }
 
-  
+    public byte[] getImagenDisenador() {
+        return this.imagenDisenador;
+    }
+
+    public void setImagenDisenador(byte[] imagenDisenador) {
+        this.imagenDisenador = imagenDisenador;
+    }
+
+    public byte[] getImagenDiseno() {
+        return this.imagenDiseno;
+    }
+
+    public void setImagenDiseno(byte[] imagenDiseno) {
+        this.imagenDiseno = imagenDiseno;
+    }
 
     public Participante() {
     }
-    
 
     public Integer getParticipanteID() {
-        return participanteID;
+        return this.participanteID;
     }
 
     public void setParticipanteID(Integer participanteID) {
@@ -42,7 +58,7 @@ public class Participante implements Serializable {
     }
 
     public String getNombreDiseno() {
-        return nombreDiseno;
+        return this.nombreDiseno;
     }
 
     public void setNombreDiseno(String nombreDiseno) {
@@ -50,7 +66,7 @@ public class Participante implements Serializable {
     }
 
     public String getDescripcionDiseno() {
-        return descripcionDiseno;
+        return this.descripcionDiseno;
     }
 
     public void setDescripcionDiseno(String descripcionDiseno) {
@@ -58,21 +74,18 @@ public class Participante implements Serializable {
     }
 
     public String getNombreDisenador() {
-        return nombreDisenador;
+        return this.nombreDisenador;
     }
 
     public void setNombreDisenador(String nombreDisenador) {
         this.nombreDisenador = nombreDisenador;
     }
 
-    public String getDesripcionDisenador() {
-        return desripcionDisenador;
+    public String getPaisDisenador() {
+        return this.pais;
     }
 
-    public void setDesripcionDisenador(String desripcionDisenador) {
-        this.desripcionDisenador = desripcionDisenador;
+    public void setPaisDisenador(String pais) {
+        this.pais = pais;
     }
-
-
-       
 }
