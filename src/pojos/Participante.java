@@ -88,4 +88,11 @@ public class Participante implements Serializable {
     public void setPaisDisenador(String pais) {
         this.pais = pais;
     }
+
+    @Override
+    public String toString() {
+        return "Participante{" + "participanteID=" + participanteID + ", nombreDiseno=" + nombreDiseno + ", descripcionDiseno=" + descripcionDiseno + ", nombreDisenador=" + nombreDisenador + ", pais=" + pais + '}';
+    }
+    
+    
 }
